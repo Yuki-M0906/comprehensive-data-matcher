@@ -1,0 +1,57 @@
+# GitHub Actions: Python アプリケーションのテストとリント
+
+name: Python application
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 pytest black
+    
+    - name: Lint with flake8
+      run: |
+        # エラーがある場合は失敗させる
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # 警告は表示するが失敗させない
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Check code formatting with black
+      run: |
+        black --check .
+      continue-on-error: true
+    
+    - name: Test script syntax
+      run: |
+        python -m py_compile comprehensive_data_matcher.py
+        python -m py_compile generate_sample_data.py
+    
+    - name: Generate sample data
+      run: |
+        python generate_sample_data.py
+    
+    # 将来的にテストを追加する場合
+    # - name: Test with pytest
+    #   run: |
+    #     pytest
