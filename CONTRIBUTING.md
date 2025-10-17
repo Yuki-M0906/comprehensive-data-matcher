@@ -169,10 +169,6 @@ git push origin feature/your-feature-name
    - より詳細な使用例
    - チュートリアル
 
-## 感謝
-
-すべての貢献者に感謝します！あなたの貢献がこのプロジェクトをより良いものにします。
-
 ---
 
 ## Code of Conduct
@@ -182,4 +178,5 @@ git push origin feature/your-feature-name
 - 親切で包括的な態度を保つ
 - 異なる視点や経験を尊重する
 - 建設的な批判を受け入れる
+
 - コミュニティに最善の利益をもたらすことに焦点を当てる
