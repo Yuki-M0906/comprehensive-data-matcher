@@ -50,7 +50,7 @@ WEIGHT_LEVENSHTEIN = 0.7
 WEIGHT_JACCARD = 0.3
 # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-# --- ロガー設定 (変更なし) ---
+# --- ロガー設定 ---
 log_formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -67,7 +67,7 @@ except Exception as e:
     print(f"致命的エラー: ログファイルハンドラの設定に失敗しました: {e}", file=sys.stderr)
     sys.exit(1)
 
-# --- 正規化関数 (変更なし) ---
+# --- 正規化関数  ---
 def normalize_cell_nfkc(value):
     if isinstance(value, str):
         return unicodedata.normalize('NFKC', value)
@@ -80,10 +80,10 @@ def normalize_for_comparison(s: str) -> str:
     return s.upper()
 
 def tokenize(s: str) -> set:
-    """文字列を単語の集合に分割（トークナイズ）する"""
+    """文字列を単語の集合に分割する"""
     # 半角/全角スペース、スラッシュなどで分割
     tokens = re.split(r'[ 　/]', s)
-    # 空の要素を除外して集合（セット）で返す
+    # 空の要素を除外して集合で返す
     return set(filter(None, tokens))
 
 def calculate_hybrid_score(s1: str, s2: str) -> dict:
@@ -231,4 +231,5 @@ if __name__ == "__main__":
         logger.critical("予期せぬエラーによりスクリプトが異常終了しました。", exc_info=True)
     finally:
         end_time = datetime.now()
+
         logger.info(f"総実行時間: {end_time - start_time}")
