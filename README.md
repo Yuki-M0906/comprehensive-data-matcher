@@ -1,38 +1,173 @@
 # Comprehensive Data Matcher
 
-[English | [日本語 (Japanese)](#japanese)]
+[English | [※日本語の解説は下記にあります]
 
-**[Try it Live]**
-https://comprehensive-data-matcher.streamlit.app/
+**[Try it Live (Web Demo)]**
+[https://comprehensive-data-matcher.streamlit.app/](https://comprehensive-data-matcher.streamlit.app/)
 
 A high-precision data deduplication and matching tool using a hybrid scoring method (Levenshtein distance and Jaccard similarity). Now supports both Web UI (Streamlit) and CLI.
 
 ## Overview
-This tool automatically matches inconsistent data (e.g., product names with typos or different word orders) to a standardized master list. 
 
-## Quick Start
+This tool automatically matches inconsistent data (e.g., product names with typos or different word orders) to a standardized master list.
+
+With the recent update, we added a Web UI powered by Streamlit, making it a hybrid architecture that supports both an intuitive browser-based operation and local CLI batch processing.
+
+### Key Features
+
+* **Hybrid Scoring:** A unique scoring method combining Levenshtein distance and Jaccard similarity for high accuracy.
+* **Dual Interface:** Supports both an intuitive Web UI and a CLI suitable for automation.
+* **Flexible Weight Adjustment:** Adjust the algorithm weights according to your data (dynamically adjustable via sliders on the Web UI).
+* **Detailed Logging:** Verify matching results one by one in real-time.
+* **Unicode Normalization:** Automatically absorbs full-width/half-width differences using NFKC normalization.
+* **High-Speed Processing:** Efficient string matching utilizing the rapidfuzz library.
+
+## Examples
+
+### Input Data Example
+
+**yuragi.xlsx** (Data with inconsistencies)
+| Product Name (商品名) |
+| --- |
+| オーバーサイズ　コットンＴシャツ　白 |
+| ビッグシルエット 綿Tシャツ ホワイト |
+| デニム スリムフィット ブルー パンツ |
+| パーカー フーディー 黒 スウェット |
+| チノパンツ ストレッチ　ベージュ |
+
+**correct.xlsx** (Standardized Master Data)
+| Product Name (商品名) |
+| --- |
+| オーバーサイズ コットンTシャツ 白 |
+| スリムフィット デニムパンツ ブルー |
+| ケーブルニット セーター グレー |
+| フード付き スウェットパーカー 黒 |
+| ストレッチ チノパン ベージュ |
+
+### Output Result Example
+
+**result_combined_high_accuracy.xlsx**
+| Original Name | Matched Standard Name | Hybrid Score | Levenshtein | Jaccard |
+| --- | --- | --- | --- | --- |
+| オーバーサイズ　コットンＴシャツ　白 | オーバーサイズ コットンTシャツ 白 | 0.967 | 0.950 | 1.000 |
+| ビッグシルエット 綿Tシャツ ホワイト | オーバーサイズ コットンTシャツ 白 | 0.725 | 0.607 | 1.000 |
+| デニム スリムフィット ブルー パンツ | スリムフィット デニムパンツ ブルー | 0.883 | 0.794 | 1.000 |
+
+## Installation
+
+### Prerequisites
+
+* Python 3.8+
+* pip
+
+### Steps
+
+1. Clone the repository
+
 ```bash
-git clone [https://github.com/Yuki-M0906/comprehensive-data-matcher.git](https://github.com/Yuki-M0906/comprehensive-data-matcher.git)
+git clone https://github.com/Yuki-M0906/comprehensive-data-matcher.git
 cd comprehensive-data-matcher
+
+```
+
+2. Install required packages
+
+```bash
 pip install -r requirements.txt
 
 ```
 
-**Run Web UI (Streamlit):**
+## Usage
 
+You can choose between two interfaces depending on your needs.
+
+### Option 1: Web UI (Streamlit)
+
+Allows you to intuitively upload Excel files from your browser and execute the matching process.
+
+* **Use the Cloud Environment:**
+Simply access the "Web Demo" URL above to use the app immediately without any setup.
+* **Run Locally:**
+Execute the following command to automatically open the Web UI in your local browser:
 ```bash
 streamlit run app.py
 
 ```
 
-**Run CLI (Batch Processing):**
+
+
+### Option 2: CLI (Command Line Interface)
+
+Ideal for automating routine tasks or batch processing tens of thousands of records.
+
+1. Place your `yuragi.xlsx` and `correct.xlsx` in the same directory as the script.
+2. Run the script:
 
 ```bash
 python comprehensive_data_matcher.py
 
 ```
 
+3. The result will be generated as `result_combined_high_accuracy.xlsx`.
+
+### Score Weight Adjustment
+
+You can adjust the matching algorithm weights via the sliders on the Web UI, or by modifying the following settings in the script for the CLI version:
+
+```python
+# Levenshtein distance weight (character-level similarity)
+WEIGHT_LEVENSHTEIN = 0.7
+
+# Jaccard similarity weight (word-level similarity)
+WEIGHT_JACCARD = 0.3
+
+```
+
+**Adjustment Guide:**
+
+* To prioritize fixing typos -> Increase `WEIGHT_LEVENSHTEIN`
+* To prioritize word order differences -> Increase `WEIGHT_JACCARD`
+
+## Algorithm Details
+
+The final score is calculated using the following formula:
+`Final Score = (Levenshtein Similarity × 0.7) + (Jaccard Similarity × 0.3)`
+
+For more details, please refer to `docs/ALGORITHM.md`.
+
+## File Structure
+
+```text
+comprehensive-data-matcher/
+├── app.py                         # Web UI script (New)
+├── comprehensive_data_matcher.py  # Core logic & CLI script
+├── requirements.txt               # Required packages
+├── README.md                      # This file
+├── LICENSE                        # License
+├── .gitignore                     # Git ignore settings
+├── examples/                      # Sample data
+└── docs/                          # Additional documentation
+
+```
+
+## Notes
+
+* Processing large datasets (10,000+ rows) via CLI may take some time.
+* Excel files must be in `.xlsx` format (`.xls` is not supported).
+
+## License
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+## Author
+
+Yuki-M0906
+
 ---
+
+---
+
+<a id="japanese"></a>
 
 # Comprehensive Data Matcher (日本語)
 
@@ -40,7 +175,7 @@ python comprehensive_data_matcher.py
 
 **[ブラウザ版デモ環境]**
 環境構築不要で、以下のURLからすぐにWebアプリ版をお試しいただけます。
-https://comprehensive-data-matcher.streamlit.app/
+[https://comprehensive-data-matcher.streamlit.app/](https://comprehensive-data-matcher.streamlit.app/)
 
 ## 概要
 
@@ -100,7 +235,7 @@ https://comprehensive-data-matcher.streamlit.app/
 1. リポジトリをクローン
 
 ```bash
-git clone [https://github.com/Yuki-M0906/comprehensive-data-matcher.git](https://github.com/Yuki-M0906/comprehensive-data-matcher.git)
+git clone https://github.com/Yuki-M0906/comprehensive-data-matcher.git
 cd comprehensive-data-matcher
 
 ```
@@ -259,3 +394,4 @@ Yuki-M0906
 
 このプロジェクトが役に立ったら、スターをつけていただけると嬉しいです！
 
+---
