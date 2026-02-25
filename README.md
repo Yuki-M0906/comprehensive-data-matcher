@@ -1,6 +1,6 @@
 # Comprehensive Data Matcher
 
-[English | [※日本語の解説は下記にあります]
+[※日本語の解説は下記にあります]
 
 **[Try it Live (Web Demo)]**
 [https://comprehensive-data-matcher.streamlit.app/](https://comprehensive-data-matcher.streamlit.app/)
@@ -175,6 +175,7 @@ Yuki-M0906
 
 **[ブラウザ版デモ環境]**
 環境構築不要で、以下のURLからすぐにWebアプリ版をお試しいただけます。
+
 [https://comprehensive-data-matcher.streamlit.app/](https://comprehensive-data-matcher.streamlit.app/)
 
 ## 概要
@@ -395,3 +396,4 @@ Yuki-M0906
 このプロジェクトが役に立ったら、スターをつけていただけると嬉しいです！
 
 ---
+
