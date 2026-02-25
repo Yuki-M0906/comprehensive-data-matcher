@@ -2,7 +2,7 @@
 
 [English | [日本語 (Japanese)](#japanese)]
 
-**[Try it Live (ブラウザ版デモ)]**
+**[Try it Live]**
 https://comprehensive-data-matcher.streamlit.app/
 
 A high-precision data deduplication and matching tool using a hybrid scoring method (Levenshtein distance and Jaccard similarity). Now supports both Web UI (Streamlit) and CLI.
@@ -34,15 +34,13 @@ python comprehensive_data_matcher.py
 
 ---
 
-<a id="japanese"></a>
-
 # Comprehensive Data Matcher (日本語)
 
 高精度な名寄せ（データマッチング）を実現するPythonツール
 
 **[ブラウザ版デモ環境]**
 環境構築不要で、以下のURLからすぐにWebアプリ版をお試しいただけます。
-https://www.google.com/url?sa=E&source=gmail&q=https://comprehensive-data-matcher.streamlit.app/
+https://comprehensive-data-matcher.streamlit.app/
 
 ## 概要
 
@@ -260,3 +258,4 @@ Yuki-M0906
 ---
 
 このプロジェクトが役に立ったら、スターをつけていただけると嬉しいです！
+
