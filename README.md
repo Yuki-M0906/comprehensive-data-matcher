@@ -1,7 +1,7 @@
 Comprehensive Data Matcher
 [English | 日本語 (Japanese)]
 
-[Try it Live]
+[Try it Live (ブラウザ版デモ)]
 https://comprehensive-data-matcher.streamlit.app/
 
 A high-precision data deduplication and matching tool using a hybrid scoring method (Levenshtein distance and Jaccard similarity). Now supports both Web UI (Streamlit) and CLI.
