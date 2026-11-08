@@ -236,8 +236,10 @@ deactivate
 セットアップが完了したら:
 
 1. [README.md](../README.md) で基本的な使い方を確認
-2. [ALGORITHM.md](ALGORITHM.md) でアルゴリズムの詳細を学習
-3. 自分のデータで試してみる
+2. `streamlit run app.py` で Web 版を開き、見本データで試してみる
+3. [ALGORITHM.md](ALGORITHM.md) でアルゴリズムの詳細を学習
+4. 自分のデータで試してみる
+5. （開発する場合）`pip install pytest` のあと `pytest` で自動テストを実行
 
 ## ヒント
 

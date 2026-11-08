@@ -49,14 +49,12 @@ jobs:
     
     - name: Test script syntax
       run: |
-        python -m py_compile comprehensive_data_matcher.py
-        python -m py_compile generate_sample_data.py
+        python -m py_compile comprehensive_data_matcher.py generate_sample_data.py sample_data.py app.py app_text.py
     
     - name: Generate sample data
       run: |
         python generate_sample_data.py
     
-    # 将来的にテストを追加する場合
-    # - name: Test with pytest
-    #   run: |
-    #     pytest
+    - name: Test with pytest
+      run: |
+        pytest -q

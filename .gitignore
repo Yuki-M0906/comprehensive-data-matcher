@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# 見本と実行結果（generate_sample_data.py と CLI が作る）
+examples/*.xlsx
+yuragi.xlsx
+correct.xlsx
+result_combined_high_accuracy.xlsx
+matcher_log_high_accuracy.txt
+
+# Streamlit の秘密の設定
+.streamlit/secrets.toml

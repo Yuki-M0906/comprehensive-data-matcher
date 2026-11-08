@@ -15,12 +15,14 @@ With the recent update, we added a Web UI powered by Streamlit, making it a hybr
 
 ### Key Features
 
-* **Hybrid Scoring:** A unique scoring method combining Levenshtein distance and Jaccard similarity for high accuracy.
-* **Dual Interface:** Supports both an intuitive Web UI and a CLI suitable for automation.
-* **Flexible Weight Adjustment:** Adjust the algorithm weights according to your data (dynamically adjustable via sliders on the Web UI).
-* **Detailed Logging:** Verify matching results one by one in real-time.
-* **Unicode Normalization:** Automatically absorbs full-width/half-width differences using NFKC normalization.
-* **High-Speed Processing:** Efficient string matching utilizing the rapidfuzz library.
+* **Hybrid Scoring:** Combines Levenshtein similarity (character level) and Jaccard similarity (word level).
+* **Web UI and CLI:** Use the browser-based Web UI, or the CLI for batch processing.
+* **Try It Instantly:** The Web UI opens with built-in sample data (Japanese apparel names and English company names). You can also paste names or upload Excel / CSV files.
+* **Review-Friendly Results:** Rows with a low score, or with a close second candidate, are flagged for review. You can see the top candidates, correct a match in the table, and download the result as Excel or CSV.
+* **Flexible Weight Adjustment:** Adjust the weights with a slider (Web UI) or in the script (CLI).
+* **Unicode Normalization:** NFKC normalization absorbs full-width/half-width differences on both sides.
+* **Fast:** All pairs are scored at once with rapidfuzz on all CPU cores. 10,000 × 10,000 names take a few seconds on a typical PC.
+* **Bilingual UI:** Japanese and English, with light and dark themes.
 
 ## Examples
 
@@ -49,9 +51,11 @@ With the recent update, we added a Web UI powered by Streamlit, making it a hybr
 **result_combined_high_accuracy.xlsx**
 | Original Name | Matched Standard Name | Hybrid Score | Levenshtein | Jaccard |
 | --- | --- | --- | --- | --- |
-| オーバーサイズ　コットンＴシャツ　白 | オーバーサイズ コットンTシャツ 白 | 0.967 | 0.950 | 1.000 |
-| ビッグシルエット 綿Tシャツ ホワイト | オーバーサイズ コットンTシャツ 白 | 0.725 | 0.607 | 1.000 |
-| デニム スリムフィット ブルー パンツ | スリムフィット デニムパンツ ブルー | 0.883 | 0.794 | 1.000 |
+| オーバーサイズ　コットンＴシャツ　白 | オーバーサイズ コットンTシャツ 白 | 1.000 | 1.000 | 1.000 |
+| ビッグシルエット 綿Tシャツ ホワイト | ラウンドネック ロングTシャツ 白 | 0.272 | 0.389 | 0.000 |
+| デニム スリムフィット ブルー パンツ | スリムフィット デニムパンツ ブルー | 0.536 | 0.595 | 0.400 |
+
+The second row is a wrong match: the name is a paraphrase ("big silhouette" for "oversize", "綿" for "cotton"), which neither measure can recognize. Its low score is why the Web UI flags such rows for review.
 
 ## Installation
 
@@ -83,17 +87,24 @@ You can choose between two interfaces depending on your needs.
 
 ### Option 1: Web UI (Streamlit)
 
-Allows you to intuitively upload Excel files from your browser and execute the matching process.
+Match names in your browser without writing any code.
 
 * **Use the Cloud Environment:**
-Simply access the "Web Demo" URL above to use the app immediately without any setup.
+Open the "Web Demo" URL above. No setup is needed.
 * **Run Locally:**
-Execute the following command to automatically open the Web UI in your local browser:
+Execute the following command to open the Web UI in your local browser:
 ```bash
 streamlit run app.py
 
 ```
 
+**How to use**
+
+1. **Choose data** — try a sample, paste names (one per line), or upload two files (Excel `.xlsx`, or CSV in UTF-8 or Shift_JIS). For files, choose the sheet and the name column.
+2. **Check the results** — the counts, a score histogram, and a table with the top candidates. A row is flagged *Review* when the top score is below the minimum, or when the second candidate is too close.
+3. **Fix and download** — if needed, choose a different name in the "Matched name" column. Then download Excel (your original columns, the results, and a settings sheet) or CSV.
+
+The public demo accepts up to 50,000 rows per file and 100 million comparisons. When running locally, you can change these limits with the environment variables `CDM_MAX_ROWS` and `CDM_MAX_PAIRS`. Data is processed in memory only and is not written to disk. For confidential data, run the app locally.
 
 
 ### Option 2: CLI (Command Line Interface)
@@ -116,17 +127,17 @@ You can adjust the matching algorithm weights via the sliders on the Web UI, or 
 
 ```python
 # Levenshtein distance weight (character-level similarity)
-WEIGHT_LEVENSHTEIN = 0.7
+DEFAULT_WEIGHT_LEVENSHTEIN = 0.7
 
 # Jaccard similarity weight (word-level similarity)
-WEIGHT_JACCARD = 0.3
+DEFAULT_WEIGHT_JACCARD = 0.3
 
 ```
 
 **Adjustment Guide:**
 
-* To prioritize fixing typos -> Increase `WEIGHT_LEVENSHTEIN`
-* To prioritize word order differences -> Increase `WEIGHT_JACCARD`
+* To prioritize fixing typos -> Increase `DEFAULT_WEIGHT_LEVENSHTEIN`
+* To prioritize word order differences -> Increase `DEFAULT_WEIGHT_JACCARD`
 
 ## Algorithm Details
 
@@ -139,9 +150,15 @@ For more details, please refer to `docs/ALGORITHM.md`.
 
 ```text
 comprehensive-data-matcher/
-├── app.py                         # Web UI script (New)
+├── app.py                         # Web UI (Streamlit)
+├── app_text.py                    # Web UI text (Japanese / English)
 ├── comprehensive_data_matcher.py  # Core logic & CLI script
+├── sample_data.py                 # Sample data (Web UI and generate_sample_data.py)
+├── generate_sample_data.py        # Writes the sample Excel files to examples/
 ├── requirements.txt               # Required packages
+├── pytest.ini                     # Test settings
+├── .streamlit/config.toml         # Streamlit settings (theme, upload size limit)
+├── tests/                         # Automated tests (pytest)
 ├── README.md                      # This file
 ├── LICENSE                        # License
 ├── .gitignore                     # Git ignore settings
@@ -152,8 +169,18 @@ comprehensive-data-matcher/
 
 ## Notes
 
-* Processing large datasets (10,000+ rows) via CLI may take some time.
-* Excel files must be in `.xlsx` format (`.xls` is not supported).
+* Excel files must be in `.xlsx` format (`.xls` is not supported). The Web UI also accepts CSV.
+* The CLI reads `yuragi.xlsx` and `correct.xlsx` (Excel only).
+
+## Tests
+
+```bash
+pip install pytest
+pytest
+
+```
+
+The tests check that the fast matching gives exactly the same scores as comparing pairs one by one, and run the Web UI without a browser.
 
 ## License
 
@@ -186,12 +213,14 @@ Yuki-M0906
 
 ### 主な特徴
 
-* **ハイブリッドスコアリング**: レーベンシュタイン類似度とJaccard係数を組み合わせた独自のスコアリング方式
-* **デュアルインターフェース対応**: 直感的なWeb UIと、自動化に適したコマンドライン（CLI）の両方をサポート
-* **柔軟な重み調整**: 用途に応じてアルゴリズムの重みを調整可能（Web画面からはスライダーで動的に調整可能）
-* **詳細なログ出力**: マッチング結果を1件ずつリアルタイムで確認可能
-* **Unicode正規化**: NFKC正規化により全角/半角の違いを吸収
-* **高速処理**: rapidfuzzライブラリによる効率的な文字列マッチング
+* **ハイブリッドスコアリング**: レーベンシュタイン類似度（文字の近さ）とJaccard係数（単語の一致）を組み合わせて点数を付けます
+* **Web UI と CLI**: ブラウザーで使う Web 版と、まとめて処理するコマンドライン版（CLI）があります
+* **すぐに試せる**: Web 版は見本データ（衣料品の商品名・英語の会社名）で開きます。名前の貼り付けや、Excel・CSV ファイルも使えます
+* **確かめやすい結果**: 点数が低いもの、2 位と僅差のものを「要確認」にします。上位の候補を見比べ、表の中で対応づけを直し、Excel・CSV で保存できます
+* **柔軟な重み調整**: Web 版はスライダーで、CLI 版はスクリプトの設定で、重みを変えられます
+* **Unicode正規化**: NFKC正規化により、全角/半角の違いを両方の側で吸収します
+* **高速処理**: 全部の組み合わせを rapidfuzz でまとめて計算します（CPU の全コアを使用）。1 万件 × 1 万件でも数秒です
+* **日英の画面**: 日本語と英語を切り替えられます。明るい表示・暗い表示の両方に対応します
 
 ## 使用例
 
@@ -220,9 +249,11 @@ Yuki-M0906
 **result_combined_high_accuracy.xlsx**
 | 元のゆらぎ名 | マッチした正規名 | ハイブリッドスコア | レーベンシュタイン類似度 | Jaccard係数 |
 | --- | --- | --- | --- | --- |
-| オーバーサイズ　コットンＴシャツ　白 | オーバーサイズ コットンTシャツ 白 | 0.967 | 0.950 | 1.000 |
-| ビッグシルエット 綿Tシャツ ホワイト | オーバーサイズ コットンTシャツ 白 | 0.725 | 0.607 | 1.000 |
-| デニム スリムフィット ブルー パンツ | スリムフィット デニムパンツ ブルー | 0.883 | 0.794 | 1.000 |
+| オーバーサイズ　コットンＴシャツ　白 | オーバーサイズ コットンTシャツ 白 | 1.000 | 1.000 | 1.000 |
+| ビッグシルエット 綿Tシャツ ホワイト | ラウンドネック ロングTシャツ 白 | 0.272 | 0.389 | 0.000 |
+| デニム スリムフィット ブルー パンツ | スリムフィット デニムパンツ ブルー | 0.536 | 0.595 | 0.400 |
+
+2 行目は取り違えです（「ビッグシルエット」「綿」は「オーバーサイズ」「コットン」の言い換えで、どちらの物差しでも見抜けません）。このように点数の低い行を、Web 版は「要確認」にします。
 
 ## インストール
 
@@ -254,7 +285,7 @@ pip install -r requirements.txt
 
 ### パターン1: Web UI版（Streamlit）を使う場合
 
-ブラウザから直感的にExcelファイルをアップロードして名寄せを実行できます。クラウド環境またはローカル環境で利用可能です。
+プログラムを書かずに、ブラウザーで名寄せができます。クラウド環境またはローカル環境で利用可能です。
 
 * **クラウド環境で使う:**
 上記の「ブラウザ版デモ環境」URLにアクセスするだけで即座に利用可能です。
@@ -265,6 +296,13 @@ streamlit run app.py
 
 ```
 
+**使い方**
+
+1. **データを選ぶ** — 見本で試す、名前を貼り付ける（1 行に 1 件）、2 つのファイルを選ぶ（Excel の `.xlsx`、または UTF-8・Shift_JIS の CSV）のどれかです。ファイルのときは、シートと名前の列を選びます。
+2. **結果を見る** — 件数、点数の分布の図、上位の候補つきの表が出ます。1 位の点数が下限より低いとき、または 2 位との差が小さいときは「要確認」になります。
+3. **直して保存する** — 必要なら「対応づけた名前」を選び直します。Excel（元の列＋結果＋設定のシート）か CSV で保存できます。
+
+公開デモでは、1 つのファイルにつき 50,000 行、比べる組み合わせは 1 億通りまでです。手元で動かすときは、環境変数 `CDM_MAX_ROWS`・`CDM_MAX_PAIRS` で上限を変えられます。データはメモリーの中だけで処理し、ファイルには保存しません。機密のデータは、手元の PC で動かしてください。
 
 
 ### パターン2: コマンドライン版（CLI）を使う場合
@@ -287,17 +325,17 @@ python comprehensive_data_matcher.py
 
 ```python
 # レーベンシュタイン距離の重み (文字レベルの類似度)
-WEIGHT_LEVENSHTEIN = 0.7
+DEFAULT_WEIGHT_LEVENSHTEIN = 0.7
 
 # Jaccard係数の重み (単語レベルの類似度)
-WEIGHT_JACCARD = 0.3
+DEFAULT_WEIGHT_JACCARD = 0.3
 
 ```
 
 **調整の指針:**
 
-* 誤字脱字に強くしたい → `WEIGHT_LEVENSHTEIN` を高く
-* 語順の違いに強くしたい → `WEIGHT_JACCARD` を高く
+* 誤字脱字に強くしたい → `DEFAULT_WEIGHT_LEVENSHTEIN` を高く
+* 語順の違いに強くしたい → `DEFAULT_WEIGHT_JACCARD` を高く
 
 ## アルゴリズムの説明
 
@@ -326,14 +364,20 @@ WEIGHT_JACCARD = 0.3
 
 ```text
 comprehensive-data-matcher/
-├── app.py                         # Web UI用スクリプト (新規追加)
+├── app.py                         # Web 版（Streamlit）
+├── app_text.py                    # Web 版の画面の文言（日本語・英語）
 ├── comprehensive_data_matcher.py  # コアロジックおよびCLI実行用スクリプト
+├── sample_data.py                 # 見本データ（Web 版と generate_sample_data.py で使う）
+├── generate_sample_data.py        # 見本の Excel を examples/ に作る
 ├── requirements.txt               # 必要なパッケージ
+├── pytest.ini                     # テストの設定
+├── .streamlit/config.toml         # Streamlit の設定（色・アップロードの上限）
+├── tests/                         # 自動テスト（pytest）
 ├── README.md                      # このファイル
 ├── LICENSE                        # ライセンス
 ├── .gitignore                     # Git除外設定
 ├── examples/                      # サンプルデータ
-│   ├── yuragi_sample.xlsx
+│   ├── yuragi_sample.xlsx         # generate_sample_data.py で作る
 │   └── correct_sample.xlsx
 └── docs/                          # 追加ドキュメント
     ├── ALGORITHM.md               # アルゴリズム詳細説明
@@ -370,9 +414,19 @@ CLI版の実行中のログは以下の2箇所に出力されます:
 
 ## 注意事項
 
-* 大量のデータ（10,000件以上）をCLIで処理する場合、実行に時間がかかることがあります
-* Excelファイルは `.xlsx` 形式である必要があります（`.xls` は非対応）
+* Excelファイルは `.xlsx` 形式である必要があります（`.xls` は非対応）。Web 版は CSV も読めます
+* CLI 版が読むのは `yuragi.xlsx` と `correct.xlsx`（Excel だけ）です
 * CLI版で入力ファイルが存在しない場合、エラーメッセージが表示されます
+
+## テスト
+
+```bash
+pip install pytest
+pytest
+
+```
+
+まとめて計算した結果が 1 組ずつ比べた結果と同じ点数になること、Web 版がブラウザーなしで動くことを確かめます。
 
 ## 貢献
 

@@ -1,0 +1,16 @@
+# Streamlit の設定（ローカルでも Streamlit Community Cloud でも使われる）
+
+# 明るい表示と暗い表示の両方で、強調の色を青にする（OS の設定に合わせて切り替わる）。
+# [theme.light] と [theme.dark] は Streamlit 1.5x の後半から。古い版では無視され、既定の色になる。
+[theme.light]
+primaryColor = "#2563EB"
+
+[theme.dark]
+primaryColor = "#60A5FA"
+
+[server]
+# 公開デモで大きすぎるファイルを受け付けない（MB）
+maxUploadSize = 20
+
+[browser]
+gatherUsageStats = false
