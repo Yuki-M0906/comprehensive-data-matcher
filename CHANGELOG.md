@@ -7,6 +7,10 @@
 
 ## [Unreleased]
 
+### 変更
+- 自動テスト（GitHub Actions）：Windows で日本語の表示が `UnicodeEncodeError` になって失敗していたのを修正（`PYTHONUTF8=1`）。1 つの環境の失敗でほかを止めないようにした（`fail-fast: false`）
+- 対応する Python を 3.9 以上に変更（3.8 はサポート終了）。自動テストは 3.9〜3.12
+
 ### 今後の予定
 - CSV形式のサポート
 - コマンドライン引数対応

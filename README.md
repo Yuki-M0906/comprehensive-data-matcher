@@ -57,7 +57,7 @@ With the recent update, we added a Web UI powered by Streamlit, making it a hybr
 
 ### Prerequisites
 
-* Python 3.8+
+* Python 3.9+
 * pip
 
 ### Steps
@@ -228,7 +228,7 @@ Yuki-M0906
 
 ### 必要な環境
 
-* Python 3.8以上
+* Python 3.9以上
 * pip
 
 ### インストール手順
