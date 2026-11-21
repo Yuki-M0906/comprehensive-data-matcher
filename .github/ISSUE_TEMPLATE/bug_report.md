@@ -24,7 +24,7 @@ assignees: ''
 
 ## 環境情報
 - OS: [例: Windows 11, macOS 13.0, Ubuntu 22.04]
-- Pythonバージョン: [例: Python 3.9.7]
+- Pythonバージョン: [例: Python 3.12.10]
 - ライブラリバージョン:
   - pandas: [例: 2.0.3]
   - openpyxl: [例: 3.1.2]

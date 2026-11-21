@@ -61,7 +61,7 @@ The second row is a wrong match: the name is a paraphrase ("big silhouette" for 
 
 ### Prerequisites
 
-* Python 3.9+
+* Python 3.10+
 * pip
 
 ### Steps
@@ -259,7 +259,7 @@ Yuki-M0906
 
 ### 必要な環境
 
-* Python 3.9以上
+* Python 3.10以上
 * pip
 
 ### インストール手順

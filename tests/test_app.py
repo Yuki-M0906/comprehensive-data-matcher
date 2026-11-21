@@ -11,7 +11,7 @@ from app_text import TEXT
 APP = str(Path(__file__).resolve().parent.parent / "app.py")
 TIMEOUT = 120
 
-# 古い streamlit.testing（Python 3.9 で入る Streamlit 1.50 など）は、2 回目以降の実行で
+# 古い streamlit.testing（Streamlit 1.50 など）は、2 回目以降の実行で
 # segmented_control の値を正しく渡せない（実際の画面では問題ない）。その版では、操作のテストを飛ばす
 NEW_APPTEST = hasattr(AppTest, "segmented_control")
 needs_new_apptest = pytest.mark.skipif(
