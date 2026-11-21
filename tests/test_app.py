@@ -43,7 +43,8 @@ def test_sample_results_are_shown_on_first_load():
     assert at.title[0].value == TEXT["ja"]["title"]
     m = metrics(at)
     assert m[TEXT["ja"]["m_rows"]] == "34"
-    assert m[TEXT["ja"]["m_ok"]].startswith("19")
+    assert m[TEXT["ja"]["m_ok"]] == "19"
+    assert any("56%" in c.value for c in at.caption)
     assert m[TEXT["ja"]["m_review"]] == "15"
 
 

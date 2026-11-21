@@ -354,10 +354,16 @@ def build_table(inp, res, top_k, th, margin, overrides, T):
 
 def score_chart(scores, groups, th, T):
     df = pd.DataFrame({"score": scores, "group": groups})
+    # 下限の文字が棒に重ならないように、いちばん高い棒の上に余白をとる
+    # （図の区切りと同じく、0.60 ちょうどは 0.60〜0.65 の棒に数える）
+    bins = np.minimum(np.floor(np.asarray(scores, dtype=float) / 0.05 + 1e-9), 19).astype(int)
+    peak = int(np.bincount(bins, minlength=20).max()) if len(bins) else 1
+    top = max(2, int(np.ceil(peak * 1.3)))
     bars = alt.Chart(df).mark_bar(cornerRadiusTopLeft=2, cornerRadiusTopRight=2).encode(
         x=alt.X("score:Q", bin=alt.Bin(extent=[0, 1], step=0.05), title=T["chart_x"],
                 scale=alt.Scale(domain=[0, 1])),
-        y=alt.Y("count():Q", title=T["chart_y"], stack=True),
+        y=alt.Y("count():Q", title=T["chart_y"], stack=True,
+                scale=alt.Scale(domain=[0, top], nice=False), axis=alt.Axis(tickMinStep=1)),
         color=alt.Color("group:N", title=None,
                         scale=alt.Scale(domain=[T["chart_ok"], T["chart_review"]], range=[COLOR_OK, COLOR_REVIEW]),
                         legend=alt.Legend(orient="top")),
@@ -423,14 +429,15 @@ def render_summary(table, flags, res, th, T):
         "review": int((flags["review"] & ~flags["edited"]).sum()),
         "edited": int(flags["edited"].sum()),
     }
-    m1, m2, m3, m4 = st.columns(4)
+    # 狭い画面でも数字が切れないように、枠は 3 つにして、細かい数字は下の 1 行に出す
+    m1, m2, m3 = st.columns(3)
     m1.metric(T["m_rows"], f"{n:,}", border=True)
-    m2.metric(T["m_ok"], T["m_ok_value"].format(n=counts["ok"], p=counts["ok"] / n) if n else "0", border=True)
+    m2.metric(T["m_ok"], f"{counts['ok']:,}", border=True)
     m3.metric(T["m_review"], f"{counts['review']:,}", border=True)
-    m4.metric(T["m_time"], T["m_time_value"].format(s=res["elapsed"]), border=True,
-              help=T["m_pairs"].format(pairs=res["pairs"]))
+    detail = T["m_detail"].format(p=counts["ok"] / n if n else 0, s=res["elapsed"], pairs=res["pairs"])
     if counts["edited"]:
-        st.caption(f"{T['st_edited']}：{counts['edited']:,}")
+        detail += f"　{T['st_edited']}：{counts['edited']:,}"
+    st.caption(detail)
 
     valid = flags["valid"]
     if valid.any():
